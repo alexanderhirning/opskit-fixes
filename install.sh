@@ -172,15 +172,10 @@ step_ansible() {
             ln -sf "$shim/ansible-playbook" "$shim/$cmd"
         done
         if ! command -v ansible-playbook &>/dev/null; then
-            _warn "$shim is not on your PATH."
-            if [[ $MODE == "auto" ]]; then
-                grep -q 'opskit-ansible' "$HOME/.profile" 2>/dev/null || {
-                    echo "export PATH=\"$shim:\$PATH\"  # opskit ansible" >> "$HOME/.profile"
-                    _warn "Added to ~/.profile — source it or re-login."
-                }
-            else
-                _info "Add to your shell rc: export PATH=\"$shim:\$PATH\""
-            fi
+            _msg "Adding $shim to your PATH."
+            _ensure_opskit_path
+            export PATH="$shim:$PATH"
+            _warn "Added to your shell rc files, open a new shell or reboot to see the changes."
         fi
         _step_done step_ansible
     else
@@ -494,6 +489,7 @@ _show_manual_steps() {
     _info "     cd opskit"
     _warn "NOTE: on a fresh install, create a new environment with"
     _warn "     opskit env create <your-env>"
+    _info "NOTE: this may require a reboot"
     echo ""
 
     _info "3. Set up vault access (optional)"
