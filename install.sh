@@ -69,6 +69,7 @@ _apt_missing() {
 
 _prompt_continue() {
     [[ $MODE == "auto" ]] && return
+    echo "  Press Enter to continue (or Ctrol+C to abort)"
     read -r -p "  Press Enter to continue (or Ctrl+C to abort)... " 2>/dev/null || true
 }
 
@@ -150,7 +151,6 @@ step_python() {
 step_ansible() {
     if step_skipped step_ansible && [[ ! "$MODE" == "refresh" ]]; then
         _msg "Ansible    — already installed."
-        _warn "ERROR: bad call of _prompt_continue in base script"
         return 0
     fi
 
@@ -160,8 +160,7 @@ step_ansible() {
             return 0
         fi
         _info "Installing ansible-core via pip..."
-        #_prompt_continue
-        _warn "ERROR: _prompt_continue hangs here, skipping"
+        _prompt_continue
         local venv="$HOME/.local/opskit-ansible"
         python3 -m venv "$venv"
         "$venv/bin/pip" install ansible-core
