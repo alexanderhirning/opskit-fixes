@@ -19,6 +19,13 @@ _msg()  { printf "  %b[✓]%b %s\n" "$_grn" "$_clr" "$*"; }
 _warn() { printf "  %b[%s]%b %s\n" "$_ylo" "!" "$_clr" "$*"; }
 _err()  { printf "  %b[✗]%b %s\n" "$_red" "$_clr" "$*" >&2; }
 _info() { printf "  %s\n" "$*"; }
+_header() {
+    printf """
+    ===================================================================
+    %s
+    ===================================================================
+    """ "$*";
+}
 
 # ── Modes ─────────────────────────────────────────────────────────────────────
 MODE="install"
@@ -88,10 +95,13 @@ _prompt_ask() {
 step_cli() {
     local missing; missing=$(_apt_missing "$PKG_CLI")
 
+    # skip if not needed
     if [[ -z "$missing" && ! "$MODE" == "refresh" ]] && step_skipped step_cli; then
         _msg "CLI tools  — already installed."
         return 0
     fi
+
+    _header "CLI Tools"
 
     if [[ $check_only == true ]]; then
         [[ -n "$missing" ]] && _err "Missing CLI packages:$missing"
@@ -118,10 +128,13 @@ step_cli() {
 step_python() {
     local missing; missing=$(_apt_missing "$PKG_PY")
 
+    # skip if not needed
     if [[ -z "$missing" && ! "$MODE" == "refresh" ]] && step_skipped step_py; then
         _msg "Python 3   — already available."
         return 0
     fi
+
+    _header "Python Packages"
 
     if [[ $check_only == true ]]; then
         if [[ -n "$missing" ]]; then
@@ -149,10 +162,13 @@ step_python() {
 }
 
 step_ansible() {
+    # return if not needed
     if step_skipped step_ansible && [[ ! "$MODE" == "refresh" ]]; then
         _msg "Ansible    — already installed."
         return 0
     fi
+
+    _header "Ansible"
 
     if ! _has_cmd ansible-playbook; then
         if [[ $check_only == true ]]; then
@@ -223,10 +239,13 @@ step_opskit_cli() {
         return 0
     fi
 
+    # return if not needed
     if [[ $check_only == true ]]; then
         [[ -x "$OPSKIT_BIN" ]] && _msg "OpsKit CLI — present ($OPSKIT_BIN)." || _err "Not executable."
         return 0
     fi
+
+    _header "Opskit CLI"
 
     mkdir -p "$shim"
     chmod +x "$OPSKIT_BIN" 2>/dev/null || true
@@ -325,10 +344,14 @@ _run_mcp_probe() {
 }
 
 step_mcp() {
+    # return if not needed
     if step_skipped step_mcp && [[ ! "$MODE" == "refresh" ]] && [[ "$check_only" != true ]]; then
         _msg "MCP servers — already configured."
         return 0
     fi
+
+    _header "MCP Servers"
+    
     if [[ $check_only == true ]]; then
         local ok=true
         for f in gen-mcp-config.py gen-mikromcp-config.py bw_session.py check-mcp-wiring.py mcp-call.py; do
