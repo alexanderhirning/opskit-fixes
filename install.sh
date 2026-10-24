@@ -259,41 +259,39 @@ step_opskit_cli() {
 #}
 
 # Garth's broken old code
-'''
-step_opskit_cli() {
-    if [[ ! -f "$OPSKIT_BIN" ]]; then
-        _err "$OPSKIT_BIN not found — is opskit cloned?"
-        [[ $check_only == true ]] && return 1
-        _info "Clone it first, then re-run."
-        exit 1
-    fi
+#step_opskit_cli() {
+#    if [[ ! -f "$OPSKIT_BIN" ]]; then
+#        _err "$OPSKIT_BIN not found — is opskit cloned?"
+#        [[ $check_only == true ]] && return 1
+#        _info "Clone it first, then re-run."
+#        exit 1
+#    fi
 
-    if step_skipped step_opskit && [[ ! "$MODE" == "refresh" ]]; then
-        _msg "OpsKit CLI — already linked."
-        return 0
-    fi
+#    if step_skipped step_opskit && [[ ! "$MODE" == "refresh" ]]; then
+#        _msg "OpsKit CLI — already linked."
+#        return 0
+#    fi
 
-    if [[ $check_only == true ]]; then
-        [[ -x "$OPSKIT_BIN" ]] && _msg "OpsKit CLI — present ($OPSKIT_BIN)." || _err "Not executable."
-        return 0
-    fi
+#    if [[ $check_only == true ]]; then
+#        [[ -x "$OPSKIT_BIN" ]] && _msg "OpsKit CLI — present ($OPSKIT_BIN)." || _err "Not executable."
+#        return 0
+#    fi
 
-    local shim="$HOME/.local/bin"
-    mkdir -p "$shim"
-    ln -sf "$OPSKIT_BIN" "$shim/opskit"
-    if command -v opskit &>/dev/null; then
-        _msg "OpsKit CLI — linked to $shim/opskit"
-    else
-        _warn "$shim not on PATH."
-        if [[ $MODE == "auto" ]]; then
-            grep -q 'local/bin' "$HOME/.profile" 2>/dev/null || {
-                echo "export PATH=\"$shim:\$PATH\"  # opskit" >> "$HOME/.profile"
-            }
-        fi
-    fi
-    _step_done step_opskit
-}
-'''
+#    local shim="$HOME/.local/bin"
+#    mkdir -p "$shim"
+#    ln -sf "$OPSKIT_BIN" "$shim/opskit"
+#    if command -v opskit &>/dev/null; then
+#        _msg "OpsKit CLI — linked to $shim/opskit"
+#    else
+#        _warn "$shim not on PATH."
+#        if [[ $MODE == "auto" ]]; then
+#            grep -q 'local/bin' "$HOME/.profile" 2>/dev/null || {
+#                echo "export PATH=\"$shim:\$PATH\"  # opskit" >> "$HOME/.profile"
+#            }
+#        fi
+#    fi
+#    _step_done step_opskit
+#}
 
 # Start every MCP server for real and confirm it can serve tools. This is the
 # check `mcp-run.sh --check` structurally cannot do: a server that parses and
