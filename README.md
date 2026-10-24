@@ -8,7 +8,7 @@ I recommend using my install.sh file, rather than the standard one, which is cur
 If this process is inconvenient for you, open issues in the main branch (found at `github.com/growlf/opskit`)
 
 ### Currently Stable Changes:
-- n/a
+- install.sh
 
 ### Changes in Development:
-- install.sh
+- none
