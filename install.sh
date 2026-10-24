@@ -189,7 +189,24 @@ step_ansible() {
     fi
 }
 
-# "fixed" function by Sonnet5.5 (Medium) on October 24th, 2026
+# "fixed" function by Sonnet5.5 (Medium) on October 24th, 2026 (including helper function)
+_ensure_opskit_path() {
+    local line='export PATH="$HOME/.local/bin:$PATH"  # opskit'
+    local rc
+
+    # Create these if missing
+    for rc in "$HOME/.bashrc" "$HOME/.profile"; do
+        [ -f "$rc" ] || touch "$rc"
+        grep -qF '# opskit' "$rc" || printf '\n%s\n' "$line" >> "$rc"
+    done
+
+    # Only patch these if they already exist (never create them)
+    for rc in "$HOME/.bash_profile" "$HOME/.zshrc" "$HOME/.zprofile"; do
+        [ -f "$rc" ] || continue
+        grep -qF '# opskit' "$rc" || printf '\n%s\n' "$line" >> "$rc"
+    done
+}
+
 step_opskit_cli() {
     if [[ ! -f "$OPSKIT_BIN" ]]; then
         _err "$OPSKIT_BIN not found — is opskit cloned?"
@@ -197,6 +214,14 @@ step_opskit_cli() {
         _info "Clone it first, then re-run."
         exit 1
     fi
+
+    local shim="$HOME/.local/bin"
+
+    # PATH setup runs in every mode, before any early return
+    if [[ $check_only != true ]]; then
+        _ensure_opskit_path
+    fi
+    export PATH="$shim:$PATH"
 
     if step_skipped step_opskit && [[ "$MODE" != "refresh" ]]; then
         _msg "OpsKit CLI — already linked."
@@ -208,17 +233,9 @@ step_opskit_cli() {
         return 0
     fi
 
-    local shim="$HOME/.local/bin"
     mkdir -p "$shim"
-    ln -sf "$OPSKIT_BIN" "$shim/opskit"
     chmod +x "$OPSKIT_BIN" 2>/dev/null || true
-
-    local path_line='export PATH="$HOME/.local/bin:$PATH"  # opskit'
-    for rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
-        [ -f "$rc" ] || touch "$rc"
-        grep -qF '# opskit' "$rc" || echo "$path_line" >> "$rc"
-    done
-    export PATH="$shim:$PATH"
+    ln -sf "$(readlink -f "$OPSKIT_BIN")" "$shim/opskit"
 
     if command -v opskit &>/dev/null; then
         _msg "OpsKit CLI — linked to $shim/opskit"
