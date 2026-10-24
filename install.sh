@@ -189,7 +189,7 @@ step_ansible() {
     fi
 }
 
-# fixed function by Big Pickle on October 24th, 2026
+# "fixed" function by Sonnet5.5 (Medium) on October 24th, 2026
 step_opskit_cli() {
     if [[ ! -f "$OPSKIT_BIN" ]]; then
         _err "$OPSKIT_BIN not found — is opskit cloned?"
@@ -198,18 +198,27 @@ step_opskit_cli() {
         exit 1
     fi
 
+    if step_skipped step_opskit && [[ "$MODE" != "refresh" ]]; then
+        _msg "OpsKit CLI — already linked."
+        return 0
+    fi
+
+    if [[ $check_only == true ]]; then
+        [[ -x "$OPSKIT_BIN" ]] && _msg "OpsKit CLI — present ($OPSKIT_BIN)." || _err "Not executable."
+        return 0
+    fi
+
     local shim="$HOME/.local/bin"
     mkdir -p "$shim"
     ln -sf "$OPSKIT_BIN" "$shim/opskit"
     chmod +x "$OPSKIT_BIN" 2>/dev/null || true
 
-    # Ensure PATH in shell configs (all modes)
     local path_line='export PATH="$HOME/.local/bin:$PATH"  # opskit'
     for rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
         [ -f "$rc" ] || touch "$rc"
-        grep -q '\.local/bin' "$rc" || echo "$path_line" >> "$rc"
+        grep -qF '# opskit' "$rc" || echo "$path_line" >> "$rc"
     done
-    export PATH="$HOME/.local/bin:$PATH"
+    export PATH="$shim:$PATH"
 
     if command -v opskit &>/dev/null; then
         _msg "OpsKit CLI — linked to $shim/opskit"
@@ -218,6 +227,36 @@ step_opskit_cli() {
     fi
     _step_done step_opskit
 }
+
+# failed function by Big Pickle on October 24th, 2026
+#step_opskit_cli() {
+#    if [[ ! -f "$OPSKIT_BIN" ]]; then
+#        _err "$OPSKIT_BIN not found — is opskit cloned?"
+#        [[ $check_only == true ]] && return 1
+#        _info "Clone it first, then re-run."
+#        exit 1
+#    fi
+
+#    local shim="$HOME/.local/bin"
+#    mkdir -p "$shim"
+#    ln -sf "$OPSKIT_BIN" "$shim/opskit"
+#    chmod +x "$OPSKIT_BIN" 2>/dev/null || true
+
+    # Ensure PATH in shell configs (all modes)
+#    local path_line='export PATH="$HOME/.local/bin:$PATH"  # opskit'
+#    for rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
+#        [ -f "$rc" ] || touch "$rc"
+#        grep -q '\.local/bin' "$rc" || echo "$path_line" >> "$rc"
+#    done
+#    export PATH="$HOME/.local/bin:$PATH"
+
+#    if command -v opskit &>/dev/null; then
+#        _msg "OpsKit CLI — linked to $shim/opskit"
+#    else
+#        _warn "opskit linked but not found in current PATH (reload shell)"
+#    fi
+#    _step_done step_opskit
+#}
 
 # Garth's broken old code
 '''
