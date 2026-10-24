@@ -189,7 +189,7 @@ step_ansible() {
     fi
 }
 
-# fixed function by Qwen3.6-35B-A3B on October 24th, 2026
+# fixed function by Big Pickle on October 24th, 2026
 step_opskit_cli() {
     if [[ ! -f "$OPSKIT_BIN" ]]; then
         _err "$OPSKIT_BIN not found — is opskit cloned?"
@@ -220,7 +220,8 @@ step_opskit_cli() {
 }
 
 # Garth's broken old code
-old_step_opskit_cli() {
+'''
+step_opskit_cli() {
     if [[ ! -f "$OPSKIT_BIN" ]]; then
         _err "$OPSKIT_BIN not found — is opskit cloned?"
         [[ $check_only == true ]] && return 1
@@ -253,6 +254,7 @@ old_step_opskit_cli() {
     fi
     _step_done step_opskit
 }
+'''
 
 # Start every MCP server for real and confirm it can serve tools. This is the
 # check `mcp-run.sh --check` structurally cannot do: a server that parses and
