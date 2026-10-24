@@ -163,7 +163,7 @@ step_ansible() {
         _prompt_continue
         local venv="$HOME/.local/opskit-ansible"
         python3 -m venv "$venv"
-        "$venv/bin/pip" install ansible-core
+        "$venv/bin/pip" install -q ansible-core
         local shim="$HOME/.local/bin"
         mkdir -p "$shim"
         printf '#!/bin/sh\nexec "%s/ansible-playbook" "$@"\n' "$venv/bin" > "$shim/ansible-playbook"
